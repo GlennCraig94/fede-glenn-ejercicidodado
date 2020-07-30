@@ -394,6 +394,34 @@ GameTest >> testPlayOverloadCard [
 ]
 
 { #category : #tests }
+GameTest >> testPlayRepeatTurnCard [
+	| board playerOne die game deckOfCards playerTwo |
+	die := LoadedDie withValue: 5.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	deckOfCards := Deck withCards: {RepeatTurnCard new}.
+	board := Board withSpaces: 100 Laps: 1.
+	game := Game
+		withBoard: board
+		dice: die
+		players:
+			{playerOne.
+			playerTwo}
+		cards: deckOfCards.
+	game playCard: RepeatTurnCard new from: playerOne.
+	game playCard: RepeatTurnCard new from: playerTwo.
+	game play: playerOne.
+	game playCard: RepeatTurnCard new from: playerTwo.
+	game play: playerTwo.
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 16 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 11 lap: 1)
+]
+
+{ #category : #tests }
 GameTest >> testPlaySpeedCard [
 	| board playerOne die game deckOfCards playerTwo |
 	die := LoadedDie withValue: 2.

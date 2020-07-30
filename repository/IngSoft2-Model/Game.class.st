@@ -82,6 +82,11 @@ Game >> applyRepeatCar: aPlayer [
 	
 ]
 
+{ #category : #'effect application' }
+Game >> applyRepeatTurnCard [
+	self repeatPlayOf: turnManager currentTurnPlayer
+]
+
 { #category : #'card application' }
 Game >> applySpeedCard: aPlayer [
 	aPlayer = turnManager currentTurnPlayer
@@ -168,6 +173,18 @@ Game >> positionOf: aPlayer [
 { #category : #ranking }
 Game >> rankOf: aPlayer [ 
 	^positionTracker getPlayersInOrderByLocker indexOf: aPlayer.
+]
+
+{ #category : #play }
+Game >> repeatPlayOf: aPlayer [ 
+	| rolled currentLocker|
+	rolled := dice roll.
+	positionTracker move: aPlayer havingRolled: rolled.
+	currentLocker := positionTracker positionOf: aPlayer.
+	currentLocker effect applyTo: self.
+	lastEffectApplied := currentLocker effect.
+
+
 ]
 
 { #category : #ranking }
