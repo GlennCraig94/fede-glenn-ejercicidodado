@@ -9,7 +9,7 @@ Class {
 
 { #category : #'card application' }
 RepeatCard >> applyTo: aGame [ 
-	aGame applyRepeatCar: target.
+	aGame applyRepeatCard: target.
 ]
 
 { #category : #classification }

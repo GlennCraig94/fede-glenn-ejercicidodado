@@ -35,7 +35,7 @@ Game >> applyAtomicBombEffect [
 	positionTracker moveAllToStart.
 ]
 
-{ #category : #'effect application' }
+{ #category : #'card application' }
 Game >> applyCancellationCard: aPermanentCard [ 
 	cardManager removeActiveCard: aPermanentCard.
 ]
@@ -75,16 +75,26 @@ Game >> applyRedoCard: aRedoCard [
 ]
 
 { #category : #'card application' }
-Game >> applyRepeatCar: aPlayer [
+Game >> applyRepeatCard: aPlayer [
    turnManager specialTurn: aPlayer.
 	self lastEffectApplied applyTo: self.
 	turnManager endSpecialTurn: aPlayer.
 	
 ]
 
-{ #category : #'effect application' }
+{ #category : #'card application' }
 Game >> applyRepeatTurnCard [
-	self repeatPlayOf: turnManager currentTurnPlayer
+	self makePlayOf: turnManager currentTurnPlayer
+]
+
+{ #category : #'card application' }
+Game >> applyReverseTurnsCard [
+	turnManager reverseTurns: turnManager currentTurnPlayer
+]
+
+{ #category : #'card application' }
+Game >> applySkipTurnCard [
+	turnManager alreadyPlayed: (turnManager currentTurnPlayer ).
 ]
 
 { #category : #'card application' }
@@ -173,18 +183,6 @@ Game >> positionOf: aPlayer [
 { #category : #ranking }
 Game >> rankOf: aPlayer [ 
 	^positionTracker getPlayersInOrderByLocker indexOf: aPlayer.
-]
-
-{ #category : #play }
-Game >> repeatPlayOf: aPlayer [ 
-	| rolled currentLocker|
-	rolled := dice roll.
-	positionTracker move: aPlayer havingRolled: rolled.
-	currentLocker := positionTracker positionOf: aPlayer.
-	currentLocker effect applyTo: self.
-	lastEffectApplied := currentLocker effect.
-
-
 ]
 
 { #category : #ranking }
