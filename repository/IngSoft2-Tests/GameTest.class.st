@@ -740,6 +740,41 @@ GameTest >> testRedoPermanentCardOverload [
 ]
 
 { #category : #tests }
+GameTest >> testRedoSkipTurnCard [
+	| board playerOne die game deckOfCards playerTwo |
+	die := LoadedDie withValue: 1.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	deckOfCards := Deck
+		withCards:
+			{RedoCard new.
+			SkipTurnCard new}.
+	board := Board
+		withSpaces: 100
+		Laps: 1
+		effects: {(DrawCardEffect withProbability: 1)}.
+	game := Game
+		withBoard: board
+		dice: die
+		players: (Array with: playerOne with: playerTwo)
+		cards: deckOfCards.
+	15
+		timesRepeat: [ game play: playerOne.
+			game play: playerTwo ].
+	game playCard: SkipTurnCard new from: playerTwo.
+	game
+		playCard: (RedoCard new target: SkipTurnCard new)
+		from: playerOne.
+	game play: playerOne.
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 16 lap: 1).
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 17 lap: 1)
+]
+
+{ #category : #tests }
 GameTest >> testRepeatMoonWalkEffect [
 	| board playerOne die game deckOfCards playerTwo |
 	die := LoadedDie withValue: 8.
