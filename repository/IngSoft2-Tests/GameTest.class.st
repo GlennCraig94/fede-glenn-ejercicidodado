@@ -740,6 +740,46 @@ GameTest >> testRedoPermanentCardOverload [
 ]
 
 { #category : #tests }
+GameTest >> testRedoRepeatTurnCard [
+	| board playerOne die game deckOfCards playerTwo playerThree |
+	die := LoadedDie withValue: 1.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	playerThree := self nicky.
+	deckOfCards := Deck
+		withCards:
+			{RedoCard new.
+			RepeatTurnCard new}.
+	board := Board
+		withSpaces: 100
+		Laps: 1
+		effects: {(DrawCardEffect withProbability: 1)}.
+	game := Game
+		withBoard: board
+		dice: die
+		players: (Array with: playerOne with: playerTwo with: playerThree)
+		cards: deckOfCards.
+	15
+		timesRepeat: [ game play: playerOne.
+			game play: playerTwo.
+			game play: playerThree ].
+	game playCard: RepeatTurnCard new from: playerOne.
+	game
+		playCard: (RedoCard new target: RepeatTurnCard new)
+		from: playerTwo.
+	game play: playerOne.
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 19 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 16 lap: 1).
+	self
+		assert: (game positionOf: playerThree)
+		equals: (Locker position: 16 lap: 1)
+]
+
+{ #category : #tests }
 GameTest >> testRedoReverseTurnsCard [
 	| board playerOne die game deckOfCards playerTwo playerThree |
 	die := LoadedDie withValue: 1.
