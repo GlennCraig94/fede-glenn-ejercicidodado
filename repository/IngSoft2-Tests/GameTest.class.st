@@ -504,6 +504,48 @@ GameTest >> testPlaySpeedCard [
 ]
 
 { #category : #tests }
+GameTest >> testPlayThreeTurnModifierCards [
+	| board playerOne die game deckOfCards playerTwo playerThree |
+	die := LoadedDie withValue: 1.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	playerThree := self nicky.
+	deckOfCards := Deck
+		withCards:
+			{SkipTurnCard new.
+			ReverseTurnsCard new.
+			RepeatTurnCard new}.
+	board := Board
+		withSpaces: 100
+		Laps: 1
+		effects: {(DrawCardEffect withProbability: 1)}.
+	game := Game
+		withBoard: board
+		dice: die
+		players: (Array with: playerOne with: playerTwo with: playerThree)
+		cards: deckOfCards.
+	15
+		timesRepeat: [ game play: playerOne.
+			game play: playerTwo.
+			game play: playerThree ].
+	game playCard: SkipTurnCard new from: playerTwo.
+	game playCard: ReverseTurnsCard new from: playerOne.
+	game play: playerTwo.
+	game play: playerOne.
+	game playCard: RepeatTurnCard new from: playerThree.
+	game play: playerThree. 
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 17 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 17 lap: 1).
+	self
+		assert: (game positionOf: playerThree)
+		equals: (Locker position: 18 lap: 1)
+]
+
+{ #category : #tests }
 GameTest >> testPlayWithSeveralCards [
 	| board playerOne die game deckOfCards finalHand |
 	die := LoadedDie withValue: 1.
