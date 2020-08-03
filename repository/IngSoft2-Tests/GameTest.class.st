@@ -394,6 +394,90 @@ GameTest >> testPlayOverloadCard [
 ]
 
 { #category : #tests }
+GameTest >> testPlayRepeatTurnCard [
+	| board playerOne die game deckOfCards playerTwo |
+	die := LoadedDie withValue: 5.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	deckOfCards := Deck withCards: {RepeatTurnCard new}.
+	board := Board withSpaces: 100 Laps: 1.
+	game := Game
+		withBoard: board
+		dice: die
+		players:
+			{playerOne.
+			playerTwo}
+		cards: deckOfCards.
+	game playCard: RepeatTurnCard new from: playerOne.
+	game playCard: RepeatTurnCard new from: playerTwo.
+	game play: playerOne.
+	game playCard: RepeatTurnCard new from: playerTwo.
+	game play: playerTwo.
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 16 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 11 lap: 1)
+]
+
+{ #category : #tests }
+GameTest >> testPlayReverseTurnsCard [
+	| board playerOne die game deckOfCards playerTwo playerThree |
+	die := LoadedDie withValue: 5.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	playerThree := self nicky.
+	deckOfCards := Deck withCards: {ReverseTurnsCard new}.
+	board := Board withSpaces: 100 Laps: 1.
+	game := Game
+		withBoard: board
+		dice: die
+		players:
+			{playerOne.
+			playerTwo.
+			playerThree}
+		cards: deckOfCards.
+	game playCard: ReverseTurnsCard new from: playerOne.
+	game play: playerOne.
+	game play: playerThree.
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 6 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 1 lap: 1).
+	self
+		assert: (game positionOf: playerThree)
+		equals: (Locker position: 6 lap: 1)	
+]
+
+{ #category : #tests }
+GameTest >> testPlaySkipTurnCard [
+	| board playerOne die game deckOfCards playerTwo |
+	die := LoadedDie withValue: 5.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	deckOfCards := Deck withCards: {SkipTurnCard new}.
+	board := Board withSpaces: 100 Laps: 1.
+	game := Game
+		withBoard: board
+		dice: die
+		players:
+			{playerOne.
+			playerTwo}
+		cards: deckOfCards.
+	game playCard: SkipTurnCard new from: playerTwo.
+	game play: playerTwo.
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 1 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 6 lap: 1)
+]
+
+{ #category : #tests }
 GameTest >> testPlaySpeedCard [
 	| board playerOne die game deckOfCards playerTwo |
 	die := LoadedDie withValue: 2.
@@ -417,6 +501,48 @@ GameTest >> testPlaySpeedCard [
 	self
 		assert: (game positionOf: playerOne)
 		equals: (Locker position: 3 lap: 1)
+]
+
+{ #category : #tests }
+GameTest >> testPlayThreeTurnModifierCards [
+	| board playerOne die game deckOfCards playerTwo playerThree |
+	die := LoadedDie withValue: 1.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	playerThree := self nicky.
+	deckOfCards := Deck
+		withCards:
+			{SkipTurnCard new.
+			ReverseTurnsCard new.
+			RepeatTurnCard new}.
+	board := Board
+		withSpaces: 100
+		Laps: 1
+		effects: {(DrawCardEffect withProbability: 1)}.
+	game := Game
+		withBoard: board
+		dice: die
+		players: (Array with: playerOne with: playerTwo with: playerThree)
+		cards: deckOfCards.
+	15
+		timesRepeat: [ game play: playerOne.
+			game play: playerTwo.
+			game play: playerThree ].
+	game playCard: SkipTurnCard new from: playerTwo.
+	game playCard: ReverseTurnsCard new from: playerOne.
+	game play: playerTwo.
+	game play: playerOne.
+	game playCard: RepeatTurnCard new from: playerThree.
+	game play: playerThree. 
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 17 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 17 lap: 1).
+	self
+		assert: (game positionOf: playerThree)
+		equals: (Locker position: 18 lap: 1)
 ]
 
 { #category : #tests }
@@ -653,6 +779,123 @@ GameTest >> testRedoPermanentCardOverload [
 	self
 		assert: (game positionOf: playerOne)
 		equals: (Locker position: 11 lap: 1)
+]
+
+{ #category : #tests }
+GameTest >> testRedoRepeatTurnCard [
+	| board playerOne die game deckOfCards playerTwo playerThree |
+	die := LoadedDie withValue: 1.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	playerThree := self nicky.
+	deckOfCards := Deck
+		withCards:
+			{RedoCard new.
+			RepeatTurnCard new}.
+	board := Board
+		withSpaces: 100
+		Laps: 1
+		effects: {(DrawCardEffect withProbability: 1)}.
+	game := Game
+		withBoard: board
+		dice: die
+		players: (Array with: playerOne with: playerTwo with: playerThree)
+		cards: deckOfCards.
+	15
+		timesRepeat: [ game play: playerOne.
+			game play: playerTwo.
+			game play: playerThree ].
+	game playCard: RepeatTurnCard new from: playerOne.
+	game
+		playCard: (RedoCard new target: RepeatTurnCard new)
+		from: playerTwo.
+	game play: playerOne.
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 19 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 16 lap: 1).
+	self
+		assert: (game positionOf: playerThree)
+		equals: (Locker position: 16 lap: 1)
+]
+
+{ #category : #tests }
+GameTest >> testRedoReverseTurnsCard [
+	| board playerOne die game deckOfCards playerTwo playerThree |
+	die := LoadedDie withValue: 1.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	playerThree := self nicky.
+	deckOfCards := Deck
+		withCards:
+			{RedoCard new.
+			ReverseTurnsCard new}.
+	board := Board
+		withSpaces: 100
+		Laps: 1
+		effects: {(DrawCardEffect withProbability: 1)}.
+	game := Game
+		withBoard: board
+		dice: die
+		players: (Array with: playerOne with: playerTwo with: playerThree)
+		cards: deckOfCards.
+	15
+		timesRepeat: [ game play: playerOne.
+			game play: playerTwo.
+			game play: playerThree ].
+	game playCard: ReverseTurnsCard new from: playerOne.
+	game play: playerOne.
+	game
+		playCard: (RedoCard new target: ReverseTurnsCard new)
+		from: playerTwo.
+	game play: playerThree.
+	game play: playerOne.
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 18 lap: 1).
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 16 lap: 1).
+	self
+		assert: (game positionOf: playerThree)
+		equals: (Locker position: 17 lap: 1)
+]
+
+{ #category : #tests }
+GameTest >> testRedoSkipTurnCard [
+	| board playerOne die game deckOfCards playerTwo |
+	die := LoadedDie withValue: 1.
+	playerOne := self fede.
+	playerTwo := self glenn.
+	deckOfCards := Deck
+		withCards:
+			{RedoCard new.
+			SkipTurnCard new}.
+	board := Board
+		withSpaces: 100
+		Laps: 1
+		effects: {(DrawCardEffect withProbability: 1)}.
+	game := Game
+		withBoard: board
+		dice: die
+		players: (Array with: playerOne with: playerTwo)
+		cards: deckOfCards.
+	15
+		timesRepeat: [ game play: playerOne.
+			game play: playerTwo ].
+	game playCard: SkipTurnCard new from: playerTwo.
+	game
+		playCard: (RedoCard new target: SkipTurnCard new)
+		from: playerOne.
+	game play: playerOne.
+	self
+		assert: (game positionOf: playerTwo)
+		equals: (Locker position: 16 lap: 1).
+	self
+		assert: (game positionOf: playerOne)
+		equals: (Locker position: 17 lap: 1)
 ]
 
 { #category : #tests }

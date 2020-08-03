@@ -35,7 +35,7 @@ Game >> applyAtomicBombEffect [
 	positionTracker moveAllToStart.
 ]
 
-{ #category : #'effect application' }
+{ #category : #'card application' }
 Game >> applyCancellationCard: aPermanentCard [ 
 	cardManager removeActiveCard: aPermanentCard.
 ]
@@ -75,11 +75,26 @@ Game >> applyRedoCard: aRedoCard [
 ]
 
 { #category : #'card application' }
-Game >> applyRepeatCar: aPlayer [
+Game >> applyRepeatCard: aPlayer [
    turnManager specialTurn: aPlayer.
 	self lastEffectApplied applyTo: self.
 	turnManager endSpecialTurn: aPlayer.
 	
+]
+
+{ #category : #'card application' }
+Game >> applyRepeatTurnCard [
+	self makePlayOf: turnManager currentTurnPlayer
+]
+
+{ #category : #'card application' }
+Game >> applyReverseTurnsCard [
+	turnManager reverseTurns: turnManager currentTurnPlayer
+]
+
+{ #category : #'card application' }
+Game >> applySkipTurnCard [
+	turnManager alreadyPlayed: (turnManager currentTurnPlayer ).
 ]
 
 { #category : #'card application' }

@@ -43,6 +43,13 @@ TurnManager >> initializeWithPlayers: somePlayers [
 	players := somePlayers asOrderedCollection.
 ]
 
+{ #category : #'as yet unclassified' }
+TurnManager >> reverseTurns: aPlayer [
+	players := players reversed.
+	players removeLast.
+	players addFirst: aPlayer
+]
+
 { #category : #turn }
 TurnManager >> specialTurn: aPlayer [
 	players addFirst: aPlayer.
