@@ -74,7 +74,7 @@ BoardTest >> testCreateBoardWithSeveralEffects [
 ]
 
 { #category : #tests }
-BoardTest >> testDistribiutionOfEffects [
+BoardTest >> testDistributionOfEffects [
 	| board result starting actualEffect counter |
 	board := Board
 		withSpaces: 10
